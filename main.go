@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,12 +23,12 @@ func main() {
 	// 获取环境变量
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("获取环境变量失败：", err)
+		panic(err)
 	}
 	// 开启数据库连接
 	db, err = sql.Open("mysql", os.Getenv("DSN"))
 	if err != nil {
-		log.Fatal("连接数据库失败", err)
+		panic(err)
 	}
 
 	// 设置路由
@@ -48,7 +47,7 @@ func GetBooks(c *gin.Context) {
 	rows, err := db.Query(query)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal("(GetBooks) db.Query", err)
+		panic(err)
 	}
 
 	books := []Book{}
@@ -76,7 +75,7 @@ func GetSingleBook(c *gin.Context) {
 	var book Book
 	err = db.QueryRow(`SELECT * FROM books WHERE id = ?`, bookID).Scan(&book.ID, &book.Title, &book.Author, &book.Cover)
 	if err != nil {
-		log.Print("(GetSingleProduct) db.Exec", err)
+		panic(err)
 	}
 
 	c.IndentedJSON(http.StatusOK, book)
